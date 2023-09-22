@@ -64,22 +64,24 @@ class ZconnectBlog extends ConsumerWidget {
         ],
       ),
       body: SafeArea(
-        child: InteractiveViewer(
-          maxScale: 5.0,
-          minScale: 1.0,
-          alignment: Alignment.center,
-          child: Markdown(
-            data: _blog.blogContent,
-            onTapLink: (text, href, title) async {
-              await launchUrl(
-                Uri.parse(href!),
-                mode: LaunchMode.platformDefault,
-                webOnlyWindowName: text,
-              );
-            },
-            onTapText: () {
-              print("Text Pressed");
-            },
+        child: Center(
+          child: Expanded(
+            child: InteractiveViewer(
+              maxScale: 5,
+              boundaryMargin: EdgeInsets.all(MediaQuery.sizeOf(context).width),
+              minScale: 0.1,
+              panEnabled: true,
+              child: Markdown(
+                data: _blog.blogContent,
+                onTapLink: (text, href, title) async {
+                  await launchUrl(
+                    Uri.parse(href!),
+                    mode: LaunchMode.platformDefault,
+                    webOnlyWindowName: text,
+                  );
+                },
+              ),
+            ),
           ),
         ),
       ),

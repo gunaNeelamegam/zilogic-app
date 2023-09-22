@@ -51,6 +51,8 @@ dependencies:
   http: ^0.13.6
   url_launcher: ^6.1.14
   just_audio: ^0.9.35
+  desktop_drop: ^0.4.3
+  file_picker: ^5.3.1
   # audioplayers: ^5.1.0
 
 dev_dependencies:

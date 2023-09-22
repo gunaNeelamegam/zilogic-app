@@ -18,7 +18,7 @@ class NotificationTile extends StatelessWidget {
       leading: notification.notificationType == NotificationType.follow
           ? const Icon(
               Icons.person,
-              color: Pallete.blueColor,
+              color: Pallete.orangeColor,
             )
           : notification.notificationType == NotificationType.like
               ? SvgPicture.asset(

@@ -16,10 +16,13 @@ class ZConnectCard extends ConsumerWidget {
         Navigator.push(context, ZconnectBlog.route(blog));
       },
       child: Column(children: [
+        const SizedBox(
+          height: 20,
+        ),
         AnimatedContainer(
           duration: const Duration(milliseconds: 500),
           width: MediaQuery.sizeOf(context).width * 0.9,
-          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          margin: const EdgeInsets.symmetric(horizontal: 10),
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [

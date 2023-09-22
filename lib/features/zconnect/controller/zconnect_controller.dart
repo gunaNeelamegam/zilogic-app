@@ -31,6 +31,9 @@ final getLatestBlogProvider = StreamProvider((ref) {
   return ref.watch(ZConnectApiProvider).getLatestBlog();
 });
 
+final getSearchByNameProvider = FutureProvider.family((ref, String title) =>
+    ref.watch(zconnectControllerProvider.notifier).searchBlogs(title));
+
 class ZConnectController extends StateNotifier<bool> {
   final ZconnectAPI _zconnectAPI;
   final NotificationAPI _notificationAPI;
@@ -48,7 +51,6 @@ class ZConnectController extends StateNotifier<bool> {
 
   void uploadBlog(
       {required IO.File blogFile,
-      required String author,
       required String title,
       required String authorName,
       required String currentUserId,
@@ -64,17 +66,19 @@ class ZConnectController extends StateNotifier<bool> {
         uploadedAt: DateTime.now());
     final res = await _zconnectAPI.uploadBlog(model);
     res.fold((l) {
-      showSnackBar(context, l.toString());
+      showSnackBar(
+          context, "${l.message} , stacktrace : ${l.stackTrace.toString()}");
       return;
     }, (r) async {
       final users = await _userAPI.getAllUsers();
       await Future.wait(users.map((user) async {
         final models.Notification notification = models.Notification(
-            text: "$authorName who published article title as $title .",
-            postId: r.$id,
-            id: ID.unique(),
-            uid: user.$id,
-            notificationType: NotificationType.blog);
+          text: "$authorName published article in title $title",
+          postId: r.$id,
+          id: ID.unique(),
+          uid: user.$id,
+          notificationType: NotificationType.blog,
+        );
         final res = await _notificationAPI.createNotification(notification);
         res.fold((l) {
           return showSnackBar(context, notification.text);
@@ -145,5 +149,11 @@ class ZConnectController extends StateNotifier<bool> {
       );
       await _notificationAPI.createNotification(notification);
     });
+  }
+
+  Future<List<ZConnectModel>> searchBlogs(String name) async {
+    final blogs = await _zconnectAPI.searchBlogByTitle(name);
+    return await Future.wait(
+        blogs.map((e) async => await ZConnectModel.fromMap(e.data)));
   }
 }

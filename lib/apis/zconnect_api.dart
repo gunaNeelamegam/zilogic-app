@@ -27,6 +27,7 @@ abstract class IZconnectApi {
   Stream<RealtimeMessage> getLatestBlog();
   Future<File> storeToBlogBucket(final IO.File blogFile);
   FutureEither<Document> likeBlog(ZConnectModel blog);
+  Future<List<Document>> searchBlogByTitle(String title);
 }
 
 class ZconnectAPI extends IZconnectApi {
@@ -94,7 +95,8 @@ class ZconnectAPI extends IZconnectApi {
       bucketId: AppwriteConstants.blogBucket,
       fileId: ID.unique(),
       file: InputFile.fromPath(
-          path: blogFile.path, filename: blogFile.path.split(".")[-2]),
+        path: blogFile.path,
+      ),
     );
     return uploadBlogFile;
   }
@@ -123,7 +125,7 @@ class ZconnectAPI extends IZconnectApi {
   @override
   Stream<RealtimeMessage> getLatestBlog() {
     return _realtime.subscribe([
-      "databases.${AppwriteConstants.databaseId}.collections.${AppwriteConstants.zconnectCollection}.documents.create"
+      "databases.${AppwriteConstants.databaseId}.collections.${AppwriteConstants.zconnectCollection}.documents"
     ]).stream;
   }
 
@@ -144,5 +146,17 @@ class ZconnectAPI extends IZconnectApi {
     } catch (error, stackTrace) {
       return left(Failure(error.toString(), stackTrace));
     }
+  }
+
+  @override
+  Future<List<Document>> searchBlogByTitle(String title) async {
+    final blogs = await _db.listDocuments(
+      databaseId: AppwriteConstants.databaseId,
+      collectionId: AppwriteConstants.zconnectCollection,
+      queries: [
+        Query.search("title", title),
+      ],
+    );
+    return blogs.documents;
   }
 }
